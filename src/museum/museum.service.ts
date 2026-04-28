@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BusinessError, BusinessLogicException } from "src/shared/errors/business-errors";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MuseumEntity } from "src/museum/museum.entity/museum.entity";
-import { Repository } from "typeorm";
+import { LessThan, Like, Repository } from "typeorm";
 
 @Injectable()
 export class MuseumService {
@@ -11,8 +11,25 @@ export class MuseumService {
         private readonly museumRepository: Repository<MuseumEntity>,
     ) { }
 
-    async findAll(): Promise<MuseumEntity[]> {
-        return await this.museumRepository.find({ relations: ['artworks', 'exhibitions'] });
+    async findAll(city?: string, name?: string, foundedBefore?: number, page: number = 1, limit: number = 10): Promise<{ data: MuseumEntity[], total: number, page: number, totalPages: number }> {
+        const where: any = {};
+        if (city) where.city = city;
+        if (name) where.name = Like(`%${name}%`);
+        if (foundedBefore) where.foundedBefore = LessThan(foundedBefore);
+
+        const [data, total] = await this.museumRepository.findAndCount({
+            where,
+            relations: ['artworks', 'exhibitions'],
+            skip: (page - 1) * limit,
+            take: limit,
+        });
+
+        return {
+            data,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+        };
     }
 
     async findOne(id: string): Promise<MuseumEntity> {
@@ -32,7 +49,7 @@ export class MuseumService {
         if (!persistedMuseum) {
             throw new BusinessLogicException("The museum with the given id was not found", BusinessError.NOT_FOUND);
         }
-        return await this.museumRepository.save(persistedMuseum);
+        return await this.museumRepository.save({ ...persistedMuseum, ...museum });
     }
 
     async delete(id: string): Promise<void> {
@@ -40,7 +57,7 @@ export class MuseumService {
         if (!museum) {
             throw new BusinessLogicException("The museum with the given id was not found", BusinessError.NOT_FOUND);
         }
-        await this.museumRepository.delete(museum);
+        await this.museumRepository.delete(id);
     }
 
 }

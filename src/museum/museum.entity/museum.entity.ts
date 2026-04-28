@@ -22,6 +22,9 @@ export class MuseumEntity {
     @Column()
     image: string;
 
+    @Column()
+    foundedBefore: number;
+
     @OneToMany(() => ExhibitionEntity, (exhibition) => exhibition.museum)
     exhibitions: ExhibitionEntity[];
 

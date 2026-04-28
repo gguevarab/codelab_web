@@ -20,4 +20,7 @@ export class MuseumDto {
     @IsUrl()
     @IsNotEmpty()
     readonly image: string;
+
+    @IsNotEmpty()
+    readonly foundedBefore: number;
 }

@@ -39,7 +39,7 @@ describe('MuseumArtworkService', () => {
         year: faker.number.int(),
         description: faker.lorem.sentence(),
         type: "Painting",
-        mainImage: faker.image.url()
+        image: faker.image.url()
       })
       artworksList.push(artwork);
     }
@@ -50,6 +50,7 @@ describe('MuseumArtworkService', () => {
       address: faker.location.secondaryAddress(),
       city: faker.location.city(),
       image: faker.image.url(),
+      foundedBefore: faker.number.int({ min: 1000, max: 2020 }),
       artworks: artworksList
     })
   }
@@ -64,7 +65,7 @@ describe('MuseumArtworkService', () => {
       year: faker.number.int(),
       description: faker.lorem.sentence(),
       type: "Painting",
-      mainImage: faker.image.url()
+        image: faker.image.url()
     });
 
     const newMuseum: MuseumEntity = await museumRepository.save({
@@ -72,7 +73,8 @@ describe('MuseumArtworkService', () => {
       description: faker.lorem.sentence(),
       address: faker.location.secondaryAddress(),
       city: faker.location.city(),
-      image: faker.image.url()
+      image: faker.image.url(),
+      foundedBefore: faker.number.int({ min: 1000, max: 2020 })
     })
 
     const result: MuseumEntity = await service.addArtworkMuseum(newMuseum.id, newArtwork.id);
@@ -92,7 +94,8 @@ describe('MuseumArtworkService', () => {
       description: faker.lorem.sentence(),
       address: faker.location.secondaryAddress(),
       city: faker.location.city(),
-      image: faker.image.url()
+      image: faker.image.url(),
+      foundedBefore: faker.number.int({ min: 1000, max: 2020 })
     })
 
     await expect(() => service.addArtworkMuseum(newMuseum.id, "0")).rejects.toHaveProperty("message", "The artwork with the given id was not found");
@@ -104,7 +107,7 @@ describe('MuseumArtworkService', () => {
       year: faker.number.int(),
       description: faker.lorem.sentence(),
       type: "Painting",
-      mainImage: faker.image.url()
+        image: faker.image.url()
     });
 
     await expect(() => service.addArtworkMuseum("0", newArtwork.id)).rejects.toHaveProperty("message", "The museum with the given id was not found");
@@ -136,7 +139,7 @@ describe('MuseumArtworkService', () => {
       year: faker.number.int(),
       description: faker.lorem.sentence(),
       type: "Painting",
-      mainImage: faker.image.url()
+        image: faker.image.url()
     });
 
     await expect(() => service.findArtworkByMuseumIdArtworkId(museum.id, newArtwork.id)).rejects.toHaveProperty("message", "The artwork with the given id is not associated to the museum");
@@ -157,7 +160,7 @@ describe('MuseumArtworkService', () => {
       year: faker.number.int(),
       description: faker.lorem.sentence(),
       type: "Painting",
-      mainImage: faker.image.url()
+        image: faker.image.url()
     });
 
     const updatedMuseum: MuseumEntity = await service.associateArtworksMuseum(museum.id, [newArtwork]);
@@ -176,7 +179,7 @@ describe('MuseumArtworkService', () => {
       year: faker.number.int(),
       description: faker.lorem.sentence(),
       type: "Painting",
-      mainImage: faker.image.url()
+        image: faker.image.url()
     });
 
     await expect(() => service.associateArtworksMuseum("0", [newArtwork])).rejects.toHaveProperty("message", "The museum with the given id was not found");
@@ -216,7 +219,7 @@ describe('MuseumArtworkService', () => {
       year: faker.number.int(),
       description: faker.lorem.sentence(),
       type: "Painting",
-      mainImage: faker.image.url()
+        image: faker.image.url()
     });
 
     await expect(() => service.deleteArtworkMuseum(museum.id, newArtwork.id)).rejects.toHaveProperty("message", "The artwork with the given id is not associated to the museum");
